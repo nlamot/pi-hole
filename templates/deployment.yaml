@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pi-hole.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "pi-hole.name" . }}
+    helm.sh/chart: {{ include "pi-hole.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "pi-hole.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "pi-hole.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: dnstcp
+              hostPort: 53
+              containerPort: 53
+              protocol: TCP 
+            - name: dnsudp
+              containerPort: 53
+              hostPort: 53
+              protocol: UDP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: 'DNS1'
+              value: {{ .Values.dns.fallback }}
+            - name: VIRTUAL_HOST
+              value: {{ .Values.dns.virtualHost }}
+            - name: WEBPASSWORD
+              value: {{ .Values.web.password }}
+          volumeMounts:
+              - mountPath: "/etc/dnsmasq.d/05-custom.conf"
+                name: {{ include "pi-hole.fullname" . }}-custom-config
+                subPath: 05-custom.conf
+              - mountPath: "/etc/pi-hole/whitelist.txt"
+                name: {{ include "pi-hole.fullname" . }}-custom-config-lists
+                subPath: whitelist.txt
+              - mountPath: "/etc/pi-hole/adlists.list"
+                name: {{ include "pi-hole.fullname" . }}-custom-config-lists
+                subPath: adlists.list
+      volumes:
+        - name: {{ include "pi-hole.fullname" . }}-custom-config
+          configMap:
+            name: {{ include "pi-hole.fullname" . }}-custom-config
+        - name: {{ include "pi-hole.fullname" . }}-custom-config-lists
+          configMap:
+            name: {{ include "pi-hole.fullname" . }}-custom-config-lists
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

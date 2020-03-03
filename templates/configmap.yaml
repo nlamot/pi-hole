@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pi-hole.fullname" . }}-custom-config
+  labels:
+    app.kubernetes.io/name: {{ include "pi-hole.name" . }}-custom-config
+    helm.sh/chart: {{ include "pi-hole.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  05-custom.conf:
+{{ toYaml .Values.configData | indent 4 }}

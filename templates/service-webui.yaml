@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pi-hole.fullname" . }}-webui
+  labels:
+    app.kubernetes.io/name: {{ include "pi-hole.name" . }}-webui
+    helm.sh/chart: {{ include "pi-hole.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: {{ include "pi-hole.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name:       http
+      port:       80
+      targetPort: 80
+      protocol:   TCP

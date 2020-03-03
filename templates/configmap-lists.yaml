@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pi-hole.fullname" . }}-custom-config-lists
+  labels:
+    app.kubernetes.io/name: {{ include "pi-hole.name" . }}-custom-config-lists
+    helm.sh/chart: {{ include "pi-hole.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  whitelist.txt:
+{{ toYaml .Values.whitelist | indent 4 }}
+  adlists.list: 
+{{ toYaml .Values.adlist | indent 4 }}
