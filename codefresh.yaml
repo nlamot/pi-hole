@@ -1,0 +1,9 @@
+version: '1.0'
+steps:
+  # Requires importing of shared configuration for the private Helm repository
+  StoreChart: 
+    title: Storing Helm chart
+    image: 'codefresh/cfstep-helm:2.9.1'
+    environment:
+      - ACTION=push
+      - CHART_REF=charts/pi-hole
