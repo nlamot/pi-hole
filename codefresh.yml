@@ -1,9 +1,13 @@
-version: '1.0'
+version: "1.0"
 steps:
-  # Requires importing of shared configuration for the private Helm repository
-  StoreChart: 
+  main_clone:
+    title: Cloning main repository...
+    type: git-clone
+    repo: 'nlamot/pi-hole'
+    git: github  
+  StoreChart:
     title: Storing Helm chart
     image: 'codefresh/cfstep-helm:2.9.1'
     environment:
       - ACTION=push
-      - CHART_REF=pi-hole
+      - CHART_REF=charts/pi-hole
