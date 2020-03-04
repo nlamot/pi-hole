@@ -6,4 +6,4 @@ steps:
     image: 'codefresh/cfstep-helm:2.9.1'
     environment:
       - ACTION=push
-      - CHART_REF=charts/pi-hole
+      - CHART_REF=pi-hole
